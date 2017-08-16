@@ -49,6 +49,7 @@ public class MainMenuScreen implements Screen {
         // Added for debug purposes, in order to check if the camera works by moving it
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             cam.translate(-2, 0, 0);
+            game.setScreen(new GameplayScreen(game));
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             cam.translate(2, 0, 0);
