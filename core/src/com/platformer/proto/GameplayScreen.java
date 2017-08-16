@@ -37,16 +37,16 @@ public class GameplayScreen implements Screen {
     public void handleInput(float delta) {
         // Added for debug purposes, in order to check if the camera works by moving it
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            cam.position.x -= 200 * delta;
+            cam.position.x -= 20;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            cam.position.x += 200 * delta;
+            cam.position.x += 20;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            cam.position.y += 200 * delta;
+            cam.position.y += 20;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            cam.position.y -= 200 * delta;
+            cam.position.y -= 20;
         }
     }
 
