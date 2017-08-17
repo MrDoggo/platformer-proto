@@ -20,7 +20,7 @@ public class MainMenuScreen implements Screen {
     public MainMenuScreen(final PlatformerProto game) {
         this.game = game;
 
-        img = new Texture("badlogic.jpg");
+        img = new Texture("menu.png");
 
         // The camera will represent the in-game position
         cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

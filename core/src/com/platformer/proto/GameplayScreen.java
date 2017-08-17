@@ -6,9 +6,15 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
+import com.platformer.entities.Player;
 
 public class GameplayScreen implements Screen {
     final PlatformerProto game;
@@ -17,16 +23,20 @@ public class GameplayScreen implements Screen {
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera cam;
 
+    private final Player player;
+
     public GameplayScreen(final PlatformerProto game) {
         this.game = game;
 
         // The camera will represent the in-game position
-        cam = new OrthographicCamera();
-        cam.setToOrtho(false, 10, 10);
+        cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
         cam.update();
 
         map = new TmxMapLoader().load("maps/map.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(map);
+
+        player = new Player(new Sprite(new Texture("images/player.png")), (TiledMapTileLayer) map.getLayers().get(0));
     }
 
     @Override
@@ -35,19 +45,7 @@ public class GameplayScreen implements Screen {
     }
 
     public void handleInput(float delta) {
-        // Added for debug purposes, in order to check if the camera works by moving it
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            cam.position.x -= 20;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            cam.position.x += 20;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            cam.position.y += 20;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            cam.position.y -= 20;
-        }
+        player.input();
     }
 
     @Override
@@ -63,9 +61,15 @@ public class GameplayScreen implements Screen {
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);
 
-        // Set
+        // Render tile map
         mapRenderer.setView(cam);
         mapRenderer.render();
+
+        player.update(delta);
+
+        game.batch.begin();
+        player.draw(game.batch);
+        game.batch.end();
     }
 
     @Override
