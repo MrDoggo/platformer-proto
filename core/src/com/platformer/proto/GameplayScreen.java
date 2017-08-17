@@ -17,6 +17,8 @@ public class GameplayScreen implements Screen {
     final PlatformerProto game;
 
     private TiledMap map;
+    private TiledMapTileLayer mapLayer;
+
     private OrthogonalTiledMapRenderer mapRenderer;
     private OrthographicCamera cam;
 
@@ -33,7 +35,9 @@ public class GameplayScreen implements Screen {
         map = new TmxMapLoader().load("maps/map.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(map);
 
-        player = new Player(new Sprite(new Texture("images/player.png")), (TiledMapTileLayer) map.getLayers().get(0));
+        // TODO: Make this an arraylist or something later with all the tile map layers, instead of only one hardcoded
+        mapLayer = (TiledMapTileLayer) map.getLayers().get(0);
+        player = new Player(new Sprite(new Texture("images/player.png")), mapLayer);
     }
 
     @Override
@@ -53,6 +57,25 @@ public class GameplayScreen implements Screen {
         // Clear screen
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Set camera to the player's position
+        cam.position.set((int) player.getX(), (int) player.getY(), 0);
+
+        // Make sure the camera doesn't go out of boundary (the tilemap size)
+        if (cam.position.x < cam.viewportWidth / 2) {
+            cam.position.x = cam.viewportWidth / 2;
+        }
+        if (cam.position.y < cam.viewportHeight / 2) {
+            cam.position.y = cam.viewportHeight / 2;
+        }
+        if (cam.position.x + cam.viewportWidth / 2 > mapLayer.getWidth() * mapLayer.getTileWidth()) {
+            cam.position.x = mapLayer.getWidth() * mapLayer.getTileWidth() - cam.viewportWidth / 2;
+        }
+        if (cam.position.y + cam.viewportHeight / 2 > mapLayer.getHeight() * mapLayer.getTileHeight()) {
+            cam.position.y = mapLayer.getHeight() * mapLayer.getTileHeight() - cam.viewportHeight / 2;
+        }
+
+        System.out.println(cam.position.x + cam.viewportWidth + " - " + mapLayer.getWidth() * mapLayer.getTileWidth());
 
         // Update camera
         cam.update();

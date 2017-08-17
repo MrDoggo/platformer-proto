@@ -65,6 +65,7 @@ public class Player extends Sprite {
             if (isCollision(prevX, newY)) {
                 sprite.setY(prevY);
                 jumping = false;
+                velocity.y = 0;
             }
         // Going upwards
         } else if (velocity.y > 0) {
@@ -77,9 +78,9 @@ public class Player extends Sprite {
 
     public void input() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            velocity.x = -55;
+            velocity.x = -400;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            velocity.x = 55;
+            velocity.x = 400;
         } else {
             velocity.x = 0;
         }
@@ -102,5 +103,13 @@ public class Player extends Sprite {
             }
         }
         return false;
+    }
+
+    public float getX() {
+        return sprite.getX();
+    }
+
+    public float getY() {
+        return sprite.getY();
     }
 }
