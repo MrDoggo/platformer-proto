@@ -50,28 +50,32 @@ public class Player extends Sprite {
 
         sprite.setX(newX);
 
+        Rectangle collidingTileX = isCollision(newX, prevY);
+        // Going left
         if (velocity.x < 0) {
-            if (isCollision(newX, prevY))
-                sprite.setX(prevX);
+            if (collidingTileX != null)
+                sprite.setX(collidingTileX.x + collidingTileX.width + 1);
+        // Going right
         } else if (velocity.x > 0) {
-            if (isCollision(newX, prevY))
-                sprite.setX(prevX);
+            if (isCollision(newX, prevY) != null)
+                sprite.setX(collidingTileX.x - 1 - sprite.getWidth());
         }
 
         sprite.setY(newY);
 
+        Rectangle collidingTileY = isCollision(prevX, newY);
         // Going downwards
         if (velocity.y < 0) {
-            if (isCollision(prevX, newY)) {
-                sprite.setY(prevY);
+            if (collidingTileY != null) {
+                sprite.setY(collidingTileY.y + collidingTileY.height);
                 jumping = false;
                 velocity.y = 0;
             }
         // Going upwards
         } else if (velocity.y > 0) {
-            if (isCollision(prevX, newY)) {
+            if (collidingTileY != null) {
                 velocity.y = 0;
-                sprite.setY(prevY);
+                sprite.setY(collidingTileY.y - sprite.getHeight());
             }
         }
     }
@@ -91,7 +95,7 @@ public class Player extends Sprite {
         }
     }
 
-    public boolean isCollision(float X, float Y) {
+    public Rectangle isCollision(float X, float Y) {
         Rectangle playerRect = new Rectangle(X, Y, sprite.getWidth(), sprite.getHeight());
 
         /* Naive approach for checking collision */
@@ -100,10 +104,10 @@ public class Player extends Sprite {
                 Rectangle tileRect = new Rectangle(x*32, y*32, 32, 32);
 
                 if (playerRect.overlaps(tileRect) && tileLayer.getCell(x, y).getTile().getProperties().containsKey("solid"))
-                    return true;
+                    return tileRect;
             }
         }
-        return false;
+        return null;
     }
 
     public float getX() {
