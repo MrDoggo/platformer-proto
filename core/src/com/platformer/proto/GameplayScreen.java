@@ -75,8 +75,6 @@ public class GameplayScreen implements Screen {
             cam.position.y = mapLayer.getHeight() * mapLayer.getTileHeight() - cam.viewportHeight / 2;
         }
 
-        System.out.println(cam.position.x + cam.viewportWidth + " - " + mapLayer.getWidth() * mapLayer.getTileWidth());
-
         // Update camera
         cam.update();
         game.batch.setProjectionMatrix(cam.combined);

@@ -15,9 +15,9 @@ public class Player extends Sprite {
     private Sprite sprite;
 
     private Vector2 velocity = new Vector2();
-    private float gravity = 10f;
-    private float maxSpeed = 400f;
-    private float jumpSpeed = 400;
+    private float gravity = 18f;
+    private float maxSpeed = 450f;
+    private float jumpSpeed = 450;
 
     private boolean jumping = true;
 
@@ -78,9 +78,9 @@ public class Player extends Sprite {
 
     public void input() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            velocity.x = -400;
+            velocity.x = -200;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            velocity.x = 400;
+            velocity.x = 200;
         } else {
             velocity.x = 0;
         }
@@ -98,6 +98,7 @@ public class Player extends Sprite {
         for (int y=0; y<tileLayer.getHeight(); y++) {
             for (int x=0; x<tileLayer.getWidth(); x++) {
                 Rectangle tileRect = new Rectangle(x*32, y*32, 32, 32);
+
                 if (playerRect.overlaps(tileRect) && tileLayer.getCell(x, y).getTile().getProperties().containsKey("solid"))
                     return true;
             }
