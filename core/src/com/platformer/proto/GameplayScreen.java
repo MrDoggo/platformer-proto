@@ -12,6 +12,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.platformer.entities.Player;
+import com.platformer.entities.SlimeEnemy;
 
 public class GameplayScreen implements Screen {
     final PlatformerProto game;
@@ -23,6 +24,8 @@ public class GameplayScreen implements Screen {
     private OrthographicCamera cam;
 
     private final Player player;
+
+    private SlimeEnemy slimeEnemy;
 
     public GameplayScreen(final PlatformerProto game) {
         this.game = game;
@@ -37,7 +40,10 @@ public class GameplayScreen implements Screen {
 
         // TODO: Make this an arraylist or something later with all the tile map layers, instead of only one hardcoded
         mapLayer = (TiledMapTileLayer) map.getLayers().get(0);
-        player = new Player(new Sprite(new Texture("images/player.png")), mapLayer);
+        player = new Player(mapLayer);
+
+        // Create test enemy character
+        slimeEnemy = new SlimeEnemy(mapLayer);
     }
 
     @Override
@@ -84,9 +90,11 @@ public class GameplayScreen implements Screen {
         mapRenderer.render();
 
         player.update(delta);
+        slimeEnemy.update(delta);
 
         game.batch.begin();
         player.draw(game.batch);
+        slimeEnemy.draw(game.batch);
         game.batch.end();
     }
 

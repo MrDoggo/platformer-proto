@@ -2,6 +2,7 @@ package com.platformer.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -11,24 +12,11 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Player extends Sprite {
-    private TiledMapTileLayer tileLayer;
-    private Sprite sprite;
-
-    private Vector2 velocity = new Vector2();
-    private float gravity = 18f;
-    private float maxSpeed = 450f;
-    private float jumpSpeed = 450;
-
-    private boolean jumping = true;
-    private boolean facingRight = true;
-
+public class Player extends Character {
     ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 
-    public Player(Sprite sprite, TiledMapTileLayer tileLayer) {
-        this.sprite = sprite;
-        this.sprite.setX(200);
-        this.sprite.setY(400);
+    public Player(TiledMapTileLayer tileLayer) {
+        super(new Sprite(new Texture("images/player.png")), 200, 400, tileLayer);
 
         this.tileLayer = tileLayer;
     }

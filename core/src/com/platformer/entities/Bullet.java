@@ -28,7 +28,7 @@ public class Bullet {
         this.starty = starty;
         this.velocity = velocity;
 
-        sprite = new Sprite(new Texture("bullet.png"));
+        sprite = new Sprite(new Texture("weapons/bullet.png"));
         sprite.setX(startx);
         sprite.setY(starty);
 
