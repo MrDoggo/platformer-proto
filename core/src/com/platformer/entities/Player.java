@@ -7,8 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-import com.platformer.proto.GameplayScreen;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Player extends Sprite {
     private TiledMapTileLayer tileLayer;
@@ -20,6 +21,9 @@ public class Player extends Sprite {
     private float jumpSpeed = 450;
 
     private boolean jumping = true;
+    private boolean facingRight = true;
+
+    ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 
     public Player(Sprite sprite, TiledMapTileLayer tileLayer) {
         this.sprite = sprite;
@@ -30,7 +34,13 @@ public class Player extends Sprite {
     }
 
     public void draw(SpriteBatch spriteBatch) {
+        // Draw player sprite
         sprite.draw(spriteBatch);
+
+        // Draw all bullets
+        for (Bullet bullet : bullets) {
+            bullet.render(spriteBatch);
+        }
     }
 
     public void update(float delta) {
@@ -57,7 +67,7 @@ public class Player extends Sprite {
                 sprite.setX(collidingTileX.x + collidingTileX.width + 1);
         // Going right
         } else if (velocity.x > 0) {
-            if (isCollision(newX, prevY) != null)
+            if (collidingTileX != null)
                 sprite.setX(collidingTileX.x - 1 - sprite.getWidth());
         }
 
@@ -78,13 +88,27 @@ public class Player extends Sprite {
                 sprite.setY(collidingTileY.y - sprite.getHeight());
             }
         }
+
+        // Update logic for all bullets
+        // Need to use iterator so it's possible to remove a bullet while iterating the list of bullets, else ConcurrentModificationException might occur
+        Iterator<Bullet> iter = bullets.iterator();
+        while (iter.hasNext()) {
+            Bullet bullet = iter.next();
+            bullet.update(delta);
+
+            if (bullet.isDone()) {
+                iter.remove();
+            }
+        }
     }
 
     public void input() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             velocity.x = -200;
+            facingRight = false;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             velocity.x = 200;
+            facingRight = true;
         } else {
             velocity.x = 0;
         }
@@ -92,6 +116,20 @@ public class Player extends Sprite {
         if (Gdx.input.isKeyPressed(Input.Keys.UP) && !jumping) {
             velocity.y = jumpSpeed;
             jumping = true;
+        }
+
+        // Player should be able to shoot something
+        if (Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_LEFT)) {
+            Vector2 bulletVelocity = new Vector2(500, 0);
+            Bullet bulletToCreate = new Bullet(sprite.getX() + sprite.getWidth(), sprite.getY() + sprite.getHeight() / 2, bulletVelocity);
+
+            // Change start position and bullet velocity to inverse, if the player is facing left instead of right
+            if (!facingRight) {
+                bulletVelocity.x = -bulletVelocity.x;
+                bulletToCreate.setX(sprite.getX() - bulletToCreate.getWidth());
+            }
+
+            bullets.add(bulletToCreate);
         }
     }
 
