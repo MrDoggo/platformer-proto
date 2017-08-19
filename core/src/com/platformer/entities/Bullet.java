@@ -1,8 +1,11 @@
 package com.platformer.entities;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
 public class Bullet {
@@ -15,6 +18,7 @@ public class Bullet {
     private int maxDistanceY = 500;
 
     private Sprite sprite;
+    ParticleEffect particleEffect;
 
     // Variable to keep track of if the bullet should still exist or not
     boolean done = false;
@@ -28,10 +32,28 @@ public class Bullet {
         sprite.setX(startx);
         sprite.setY(starty);
 
+        // If the bullet goes left, it should subtract its start position with the length of the bullet image
+        if (velocity.x < 0) {
+            startx -= sprite.getWidth();
+        }
+
+        float particleX, particleY;
+        if (velocity.x < 0)
+            particleX = sprite.getX() - 10;
+        else
+            particleX = sprite.getX() + 10;
+        particleY = starty;
+
+        particleEffect = new ParticleEffect();
+        particleEffect.load(Gdx.files.internal("particles/bullet"), Gdx.files.internal(""));
+        particleEffect.getEmitters().first().setPosition(particleX, particleY);
+        particleEffect.start();
     }
 
     public void render(SpriteBatch batch) {
         sprite.draw(batch);
+
+        particleEffect.draw(batch);
     }
 
     public void update(float delta) {
@@ -45,14 +67,9 @@ public class Bullet {
             if (sprite.getX() > startx + maxDistanceX)
                 done = true;
         }
-    }
 
-    public void setX(float x) {
-        sprite.setX(x);
-    }
-
-    public void setY(float y) {
-        sprite.setY(y);
+        // Update particle effect
+        particleEffect.update(delta);
     }
 
     public float getWidth() {

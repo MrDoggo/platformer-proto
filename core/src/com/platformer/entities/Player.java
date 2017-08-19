@@ -121,12 +121,14 @@ public class Player extends Sprite {
         // Player should be able to shoot something
         if (Gdx.input.isKeyJustPressed(Input.Keys.CONTROL_LEFT)) {
             Vector2 bulletVelocity = new Vector2(500, 0);
-            Bullet bulletToCreate = new Bullet(sprite.getX() + sprite.getWidth(), sprite.getY() + sprite.getHeight() / 2, bulletVelocity);
+            Bullet bulletToCreate;
 
             // Change start position and bullet velocity to inverse, if the player is facing left instead of right
             if (!facingRight) {
                 bulletVelocity.x = -bulletVelocity.x;
-                bulletToCreate.setX(sprite.getX() - bulletToCreate.getWidth());
+                bulletToCreate = new Bullet(sprite.getX(), sprite.getY() + sprite.getHeight() / 2, bulletVelocity);
+            } else {
+                bulletToCreate = new Bullet(sprite.getX() + sprite.getWidth(), sprite.getY() + sprite.getHeight() / 2, bulletVelocity);
             }
 
             bullets.add(bulletToCreate);
