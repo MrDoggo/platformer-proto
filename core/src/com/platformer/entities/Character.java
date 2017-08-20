@@ -1,16 +1,26 @@
 package com.platformer.entities;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 /*
 The mother of all character objects, both NPCs and the player character
 Contains all reusable stuff like gravity, collision with tiles, etc...
 */
 public abstract class Character {
+    public enum State { FALLING, JUMPING, STANDING, RUNNING };
+    public State currentState = State.STANDING;
+    public State previousState = State.STANDING;
+    protected float animationTimer = 0;
+    protected boolean facingRight = true;
+    protected boolean jumping = true; // TODO: Remove?
+
     protected TiledMapTileLayer tileLayer;
     protected Sprite sprite;
 
@@ -18,9 +28,6 @@ public abstract class Character {
     protected float gravity = 18f;
     protected float maxSpeed = 450f;
     protected float jumpSpeed = 450;
-
-    protected boolean jumping = true;
-    protected boolean facingRight = true;
 
     public Character(Sprite sprite, int x, int y, TiledMapTileLayer tileLayer) {
         this.sprite = sprite;
@@ -83,6 +90,9 @@ public abstract class Character {
                 sprite.setY(collidingTileY.y - sprite.getHeight());
             }
         }
+
+        // Makes sure that the character in question changes appearance depending on how getFrame() is defined, so animation occurs
+        sprite.setRegion(getFrame(delta));
     }
 
     public Rectangle isCollision(float X, float Y) {
@@ -98,5 +108,18 @@ public abstract class Character {
             }
         }
         return null;
+    }
+
+    public abstract TextureRegion getFrame(float delta);
+
+    public State getState() {
+        if (velocity.y > 0 || (velocity.y < 0 && previousState == State.JUMPING))
+            return State.JUMPING;
+        else if (velocity.y < 0)
+            return State.FALLING;
+        else if (velocity.x != 0)
+            return State.RUNNING;
+        else
+            return State.STANDING;
     }
 }

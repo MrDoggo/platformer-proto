@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -24,8 +25,9 @@ public class GameplayScreen implements Screen {
     private OrthographicCamera cam;
 
     private final Player player;
-
     private SlimeEnemy slimeEnemy;
+
+    private final TextureAtlas atlas;
 
     public GameplayScreen(final PlatformerProto game) {
         this.game = game;
@@ -35,15 +37,21 @@ public class GameplayScreen implements Screen {
         cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
         cam.update();
 
+        // Load map tile from Tiled, that contains all the tile maps
         map = new TmxMapLoader().load("maps/map.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(map);
 
+        // Load texture atlas containing all the character images used for animation
+        atlas = new TextureAtlas("characters.pack");
+
         // TODO: Make this an arraylist or something later with all the tile map layers, instead of only one hardcoded
         mapLayer = (TiledMapTileLayer) map.getLayers().get(0);
-        player = new Player(mapLayer);
+
+        // Create player character
+        player = new Player(mapLayer, atlas);
 
         // Create test enemy character
-        slimeEnemy = new SlimeEnemy(mapLayer);
+        slimeEnemy = new SlimeEnemy(mapLayer, atlas);
     }
 
     @Override
@@ -93,8 +101,8 @@ public class GameplayScreen implements Screen {
         slimeEnemy.update(delta);
 
         game.batch.begin();
-        player.draw(game.batch);
         slimeEnemy.draw(game.batch);
+        player.draw(game.batch);
         game.batch.end();
     }
 

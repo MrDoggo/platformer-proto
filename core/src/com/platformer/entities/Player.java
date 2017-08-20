@@ -3,11 +3,11 @@ package com.platformer.entities;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,10 +15,24 @@ import java.util.Iterator;
 public class Player extends Character {
     ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 
-    public Player(TiledMapTileLayer tileLayer) {
-        super(new Sprite(new Texture("images/player.png")), 200, 400, tileLayer);
+    private Animation<TextureRegion> playerWalk;
+    private TextureRegion playerStand;
+
+    public Player(TiledMapTileLayer tileLayer, TextureAtlas atlas) {
+        super(new Sprite(atlas.findRegion("player/walk1")), 200, 400, tileLayer);
 
         this.tileLayer = tileLayer;
+
+        playerStand = new TextureRegion(sprite.getTexture(), 0, 0, 14, 31); // Standing should not be animated, just a still picture
+
+        // TODO: Fix walk animation etc...
+        int CHARACTER_WIDTH = 14;
+        int CHARACTER_HEIGHT = 31;
+        /*Array<TextureRegion> frames = new Array<TextureRegion>();
+        for (int i=0; i<1; i++) {
+            frames.add(new TextureRegion(sprite.getTexture(), i * CHARACTER_WIDTH, 0, CHARACTER_WIDTH, CHARACTER_HEIGHT));
+        }
+        playerWalk = new Animation<TextureRegion>(0.1f, frames);*/
     }
 
     public void draw(SpriteBatch spriteBatch) {
@@ -66,7 +80,6 @@ public class Player extends Character {
         if (velocity.y < 0) {
             if (collidingTileY != null) {
                 sprite.setY(collidingTileY.y + collidingTileY.height);
-                jumping = false;
                 velocity.y = 0;
             }
         // Going upwards
@@ -88,22 +101,24 @@ public class Player extends Character {
                 iter.remove();
             }
         }
+
+        // Makes sure that the character in question changes appearance depending on how getFrame() is defined, so animation occurs
+        sprite.setRegion(getFrame(delta));
     }
 
     public void input() {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             velocity.x = -200;
-            facingRight = false;
+            //facingRight = false;
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
             velocity.x = 200;
-            facingRight = true;
+            //facingRight = true;
         } else {
             velocity.x = 0;
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) && !jumping) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP) && getState() != State.JUMPING && getState() != State.FALLING) {
             velocity.y = jumpSpeed;
-            jumping = true;
         }
 
         // Player should be able to shoot something
@@ -123,19 +138,31 @@ public class Player extends Character {
         }
     }
 
-    public Rectangle isCollision(float X, float Y) {
-        Rectangle playerRect = new Rectangle(X, Y, sprite.getWidth(), sprite.getHeight());
+    public TextureRegion getFrame(float delta) {
+        currentState = getState();
 
-        /* Naive approach for checking collision */
-        for (int y=0; y<tileLayer.getHeight(); y++) {
-            for (int x=0; x<tileLayer.getWidth(); x++) {
-                Rectangle tileRect = new Rectangle(x*32, y*32, 32, 32);
-
-                if (playerRect.overlaps(tileRect) && tileLayer.getCell(x, y).getTile().getProperties().containsKey("solid"))
-                    return tileRect;
-            }
+        TextureRegion region;
+        switch (currentState) {
+            case RUNNING:
+            case JUMPING:
+            case FALLING:
+            case STANDING:
+            default:
+                region = playerStand;
         }
-        return null;
+
+        if ((velocity.x < 0 || !facingRight) && !region.isFlipX()) {
+            region.flip(true, false);
+            facingRight = false;
+        } else if ((velocity.x > 0 || facingRight) && region.isFlipX()) {
+            region.flip(true, false);
+            facingRight = true;
+        }
+
+        animationTimer = (currentState == previousState) ? animationTimer + delta : 0;
+        previousState = currentState;
+
+        return region;
     }
 
     public float getX() {

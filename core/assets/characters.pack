@@ -1,0 +1,31 @@
+
+characters.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+player/walk1
+  rotate: false
+  xy: 1, 1
+  size: 14, 31
+  orig: 14, 31
+  offset: 0, 0
+  index: -1
+
+characters2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+slime/slimeWalk1
+  rotate: false
+  xy: 1, 1
+  size: 50, 28
+  orig: 50, 28
+  offset: 0, 0
+  index: -1
+slime/slimeWalk2
+  rotate: false
+  xy: 53, 1
+  size: 50, 28
+  orig: 50, 28
+  offset: 0, 0
+  index: -1
